@@ -1,0 +1,177 @@
+---
+title: "MTH6139 Time Series" 
+subtitle: "Coursework 1 -- Air Passengers" 
+author: "Nabeel Asghar" 
+date: "Spring term 2025" 
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    theme: spacelab 
+    highlight: tango
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r, echo=FALSE}
+# This code will display the QMUL logo at the top right of the page
+# Do not change this code
+htmltools::img(src = knitr::image_uri("images/QMlogo.png"),
+               alt = 'logo',
+               style = 'position:absolute; top:0; right:0; padding:10px; width:20%;')
+```
+
+#  Section 1.1: Understanding the Air Passenger Dataset ✈️
+
+```{r, echo=FALSE}
+# This code will display the QMUL logo at the top right of the page
+# Do not change this code
+htmltools::img(src = knitr::image_uri("images/aeroplane.png"),
+               alt = 'logo',
+               style = 'position:absolute; top:0; right:0; padding:10px; width:20%;')
+```
+
+
+The Air Passengers dataset contains the monthly airline passenger counts (in thousands) in between the years of 1949 through to 1960. It is a useful dataset, often used to demonstrate time series forecasting
+
+
+```{r}
+# Load necessary libraries
+library(prophet)
+library(zoo)
+
+# Load and inspect the AirPassengers dataset
+data("AirPassengers")
+str(AirPassengers)  # Structure of the dataset
+summary(AirPassengers)  # Summary statistics
+```
+# Section 1.2: Preparing the Data for Prophet 
+Prophet requires a dataframe with:
+	•	A date column named ds (datetime format)
+	•	A values column named y (numeric format)
+
+We will convert the AirPassengers dataset into this required format.
+
+```{r}
+# Convert AirPassengers dataset into a dataframe suitable for Prophet
+air_passengers_df <- data.frame(
+  ds = as.Date(as.yearmon(time(AirPassengers))),  # Convert to date format
+  y = as.numeric(AirPassengers)  # Convert passenger count to numeric
+)
+
+# Display first few rows of the dataset
+head(air_passengers_df)
+```
+Now that we have cleaned and formatted the data we can prepare for take off and fit the prophet model.
+
+# Section 1.3: Building a Prophet Model 
+Prophet handles seasonality, trend, and missing values very well. We will train the model and make a prediction for the next 24 months.
+```{r}
+# Fit the Prophet model
+model <- prophet(air_passengers_df)
+
+# Create future dates for forecasting (24 months ahead)
+future_dates <- make_future_dataframe(model, periods = 24, freq = "month")
+
+# Generate predictions
+forecast <- predict(model, future_dates)
+
+# Display the first few forecasted values
+head(forecast)
+```
+
+# Section 1.4: Visualising the Forecast 🗓️
+Now, let’s visualize the forecast to see what Prophet predicts for the next two years.
+```{r}
+# Plot the forecast
+plot(model, forecast)
+```
+
+Prophet's predictions are depicted by the blue line in the graph, while the shaded area marks the uncertainty intervals.
+
+🔍 Looking at Components
+
+Prophet also allows us to break down the forecast into its components: trend, yearly seasonality, and weekly seasonality.
+```{r}
+# Plot the forecast components
+prophet_plot_components(model, forecast)
+```
+This breakdown helps us understand the underlying patterns in air travel demand. The strong yearly seasonality reflects how air travel fluctuates based on holidays, weather, and other seasonal factors. 
+
+# Section 1.5: Insights and Interpretations 📊
+We can clearly see that there is a:
+
+Clear Upward Trend 📈 as Air Travel was increasing over time before 1960. This could possibly be the result of the rise of commercial aviation after World War 2 due to improvements in aircraft technology.
+
+Strong Seasonality 🏖️ Peaks during summer months means that this was the most popular time to travel due to favourable flying conditions and more holidays are in the summer.
+
+# Section 1.6: Conclusions 
+
+In this project, we explored the Air Passengers dataset, built a Prophet forecasting model, and visualized trends in air travel. Prophet is an incredibly useful tool for making time series predictions, and this analysis could be expanded further by integrating external variables (like economic indicators or fuel prices) to improve accuracy.
+
+This coursework provided a great opportunity to apply time series forecasting techniques and practice working with real-world datasets. Hopefully, this knowledge I have applied will be useful in my studies and in my future career! 🎯
+
+
+# Section 1.7: References 🔗
+
+ https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/AirPassengers.html
+
+
+
+
+
+
+```{r echo=FALSE}
+library(astsa)
+start(ENSO)
+end(ENSO)
+frequency(ENSO)
+```
+
+
+
+
+# Section 2: This is the second section
+
+## 2.1 Including image files
+
+You can include images with `![](images/QMlogo.png)`
+
+![](images/QMlogo.png)
+
+## 2.2 Including hyperlinks
+
+You can write an URL by surrounding it by `<` and `>`, this will render
+like this: <https://www.qmul.ac.uk>
+
+You can also hyperlink text to a URL using `[text](url)`. For example:
+`[Click here to go to the QMUL website](https://www.qmul.ac.uk)` results
+in
+
+[Click here to go to the QMUL website](https://www.qmul.ac.uk)
+
+## 2.2 Displaying plots
+
+You can also display plots. For example, the code below will display a
+plot of the ENSO data.
+
+```{r}
+plot(ENSO)
+```
+
+## 2.3 Writing equations
+
+In the course we will not use this much, but in case you want, you can
+also write equations using $\LaTeX$. For example, the equation of a
+straight line is $y = mx + b$. $$
+z=\frac{1}{\sqrt{2\pi}}e^{-\frac{1}{2}x^2}
+$$ etc.
+
+# References
+
+-   Datacamp course:
+    <https://www.datacamp.com/courses/reporting-with-rmarkdown>
+-   RStudio reference: <https://rmarkdown.rstudio.com/lesson-1.html>
+-   More sophisticated reference:
+    <https://bookdown.org/yihui/rmarkdown/>
